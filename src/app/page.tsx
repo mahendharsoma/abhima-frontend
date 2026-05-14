@@ -1,65 +1,260 @@
-import Image from "next/image";
+import Link from "next/link";
+import { getImageUrl } from "@/lib/api";
+import {
+  listWebsiteServices,
+  listFeaturedWebsiteServices,
+  listWebsiteProducts,
+  listFeaturedWebsiteProducts,
+  listWebsiteProductTags,
+  listWhyChooseUs,
+  listIndustries,
+  listAboutUs,
+  getBanners,
+  getSetting,
+} from "@/lib/website";
 
-export default function Home() {
+export default async function Home() {
+  const [services, featuredServices, products, featuredProducts, whyChooseUs, industries, aboutUsList, banners, setting] = await Promise.all([
+    listWebsiteServices().catch(() => []),
+    listFeaturedWebsiteServices().catch(() => []),
+    listWebsiteProducts().catch(() => []),
+    listFeaturedWebsiteProducts().catch(() => []),
+    listWhyChooseUs().catch(() => []),
+    listIndustries().catch(() => []),
+    listAboutUs().catch(() => []),
+    getBanners().catch(() => null),
+    getSetting().catch(() => null),
+  ]);
+
+  const productTagsMap = new Map<number, string[]>();
+  await Promise.all(
+    featuredProducts.map(async (p) => {
+      const tags = await listWebsiteProductTags(p.id).catch(() => []);
+      productTagsMap.set(p.id, tags.map((t) => t.tagName));
+    }),
+  );
+
+  const aboutUs = aboutUsList[0];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <>
+      {/* ========== HERO ========== */}
+      <section className="hero">
+        {banners?.heroVideo && (
+          <video
+            className="hero-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label="Abhima hero video"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <source src={banners.heroVideo} type="video/mp4" />
+          </video>
+        )}
+        <div className="container">
+          <div className="hero-grid">
+            <div className="hero-left">
+              {banners?.heroBannerText && (
+                <h1 className="section-title">
+                  <span className="text-white">
+                    {banners.heroBannerText.substring(0, banners.heroBannerText.lastIndexOf(" "))}{" "}
+                  </span>
+                  <span className="accent">
+                    {banners.heroBannerText.substring(banners.heroBannerText.lastIndexOf(" ") + 1)}
+                  </span>
+                </h1>
+              )}
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* ========== ABOUT ========== */}
+      <section className="about" id="about">
+        <div className="container">
+          <div className="about-left">
+            <span className="section-badge outline">
+              <i className="fas fa-circle"></i> {aboutUs?.sectionBadge || "WHO WE ARE"}
+            </span>
+            {setting?.companyName && (
+              <h2 className="section-title about-title-single-line">
+                About <span className="accent">{setting.companyName}</span>
+              </h2>
+            )}
+            {aboutUs && (
+              <>
+                {aboutUs.title && <p className="section-subtitle">{aboutUs.title}</p>}
+                {aboutUs.description && (
+                  <div
+                    className="section-subtitle"
+                    style={{ marginTop: 12 }}
+                    suppressHydrationWarning
+                    dangerouslySetInnerHTML={{
+                      __html: aboutUs.description,
+                    }}
+                  />
+                )}
+              </>
+            )}
+          </div>
+          <div className="about-right">
+            {aboutUs?.aboutImage && (
+              <div className="about-image">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={getImageUrl(aboutUs.aboutImage)}
+                  alt={setting?.companyName || "About"}
+                  loading="lazy"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== SERVICES ========== */}
+      <section className="services" id="services">
+        <div className="section-header container">
+          <div>
+            <span className="section-badge dark">
+              <i className="fas fa-circle"></i> WHAT WE DO
+            </span>
+            <h2 className="section-title">
+              Our Core <span className="accent">Services</span>
+            </h2>
+          </div>
+          <Link href="/services" className="section-header-link">
+            <i className="fas fa-arrow-right"></i>
+          </Link>
+        </div>
+        <div className="container">
+          <div className="services-grid">
+            {featuredServices.map((svc) => (
+              <div className="service-card" key={svc.id}>
+                <div className="service-image">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={getImageUrl(svc.serviceImage)}
+                    alt={svc.title}
+                    loading="lazy"
+                  />
+                </div>
+                <h3>{svc.title}</h3>
+                <p>{svc.shortDescription}</p>
+                <Link
+                  href={`/service-details?id=${svc.id}`}
+                  className="service-link"
+                >
+                  Learn More <i className="fas fa-arrow-right"></i>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== PRODUCTS ========== */}
+      <section className="products" id="products">
+        <div className="section-header container">
+          <div>
+            <span className="section-badge light">
+              <i className="fas fa-circle"></i> What We Offer
+            </span>
+            <h2 className="section-title">
+              Our <span className="accent">Product Suite</span>
+            </h2>
+          </div>
+          <Link href="/portfolio" className="section-header-link">
+            <i className="fas fa-arrow-right"></i>
+          </Link>
+        </div>
+        <div className="container">
+          <div className="products-grid">
+            {featuredProducts.map((product) => {
+              const tags = productTagsMap.get(product.id) ?? [];
+              return (
+                <div className="product-card" key={product.id}>
+                  <div className="product-image">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getImageUrl(product.productImage)}
+                      alt={product.title}
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3>{product.title}</h3>
+                  <p>{product.description}</p>
+                  {tags.length > 0 && (
+                    <div className="product-tags">
+                      {tags.map((tag) => (
+                        <span className="product-tag" key={tag}>{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== WHY CHOOSE US ========== */}
+      <section className="why-us">
+        <div className="section-header container">
+          <span className="section-badge dark">
+            <i className="fas fa-circle"></i> WHY CHOOSE US
+          </span>
+          <h2 className="section-title">What&apos;s <span className="accent">Sets Us</span> Apart</h2>
+        </div>
+        <div className="container">
+          <div className="why-grid">
+            {whyChooseUs.map((item) => (
+              <div className="why-card" key={item.id}>
+                <div className="why-card-media">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={getImageUrl(item.whyChooseUsImage)}
+                    alt={item.title}
+                    loading="lazy"
+                  />
+                </div>
+                <div className="why-card-overlay">
+                  <h3 className="why-card-title">{item.title}</h3>
+                  <p className="why-card-desc">{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== INDUSTRIES ========== */}
+      <section className="industries">
+        <div className="section-header container">
+          <span className="section-badge outline">
+            <i className="fas fa-circle"></i> Industries
+          </span>
+          <h2 className="section-title">
+            {" "}<span className="accent">Domains</span> We Support{" "}
+          </h2>
+        </div>
+        <div className="container">
+          <div className="industries-list">
+            {industries.map((industry) => (
+              <span key={industry.id} className="industry-pill">
+                {industry.icon && (
+                  <span className="industry-icon" aria-hidden="true">
+                    <i className={industry.icon}></i>
+                  </span>
+                )}
+                <span>{industry.name}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
