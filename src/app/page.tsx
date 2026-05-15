@@ -117,17 +117,12 @@ export default async function Home() {
       {/* ========== SERVICES ========== */}
       <section className="services" id="services">
         <div className="section-header container">
-          <div>
-            <span className="section-badge dark">
-              <i className="fas fa-circle"></i> WHAT WE DO
-            </span>
-            <h2 className="section-title">
-              Our Core <span className="accent">Services</span>
-            </h2>
-          </div>
-          <Link href="/services" className="section-header-link">
-            <i className="fas fa-arrow-right"></i>
-          </Link>
+          <span className="section-badge dark">
+            <i className="fas fa-circle"></i> WHAT WE DO
+          </span>
+          <h2 className="section-title">
+            Our Core <span className="accent">Services</span>
+          </h2>
         </div>
         <div className="container">
           <div className="services-grid">
@@ -158,17 +153,12 @@ export default async function Home() {
       {/* ========== PRODUCTS ========== */}
       <section className="products" id="products">
         <div className="section-header container">
-          <div>
-            <span className="section-badge light">
-              <i className="fas fa-circle"></i> What We Offer
-            </span>
-            <h2 className="section-title">
-              Our <span className="accent">Product Suite</span>
-            </h2>
-          </div>
-          <Link href="/portfolio" className="section-header-link">
-            <i className="fas fa-arrow-right"></i>
-          </Link>
+          <span className="section-badge light">
+            <i className="fas fa-circle"></i> What We Offer
+          </span>
+          <h2 className="section-title">
+            Our <span className="accent">Product Suite</span>
+          </h2>
         </div>
         <div className="container">
           <div className="products-grid">
