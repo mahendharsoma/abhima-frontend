@@ -25,9 +25,9 @@ export const metadata: Metadata = {
     "ABHIMA ",
 
   icons: {
-    icon: "/images/superlogo.png",
-    shortcut: "/images/superlogo.png",
-    apple: "/images/superlogo.png",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 
@@ -39,9 +39,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
-        <link rel="icon" type="image/png" href="/images/superlogo.png" />
-        <link rel="shortcut icon" type="image/png" href="/images/superlogo.png" />
-        <link rel="apple-touch-icon" href="/images/superlogo.png" />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
       </head>
       <body>
         <Header />
