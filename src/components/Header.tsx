@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { NavVisibility } from "@/lib/website";
+
 
 const ALL_NAV_ITEMS = [
   { href: "/",         label: "Home",         key: "home"       },
@@ -19,6 +19,8 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [navVis, setNavVis] = useState<NavVisibility | null>(null);
+  const [logoSrc, setLogoSrc] = useState("/images/logo.png");
+  const [groupLogoSrc, setGroupLogoSrc] = useState("/images/superlogo.png");
   const pathname = usePathname();
 
   useEffect(() => {
@@ -33,23 +35,28 @@ export default function Header() {
       .then((data: NavVisibility) => setNavVis(data))
       .catch(() => {}); // keep all items visible on error
   }, []);
+console.log("Nav visibility:", navVis);
+
+  useEffect(() => {
+    fetch("/api/setting")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data) return;
+        if (data.logo) setLogoSrc(data.logo as string);
+        if (data.abhimaGroupLogo) setGroupLogoSrc(data.abhimaGroupLogo as string);
+      })
+      .catch(() => {});
+  }, []);
 
   const navItems = navVis
     ? ALL_NAV_ITEMS.filter((item) => navVis[item.key])
     : ALL_NAV_ITEMS;
-
+console.log(navItems);
   return (
     <header className={`header${scrolled ? " scrolled" : ""}`}>
       <div className="container">
         <Link href="/" className="logo">
-          <Image
-            src="/images/logo.png"
-            alt="Abhima Technologies"
-            className="logo-img"
-            width={120}
-            height={120}
-            priority
-          />
+          <img src={logoSrc} alt="Abhima Technologies" className="logo-img" />
         </Link>
         <nav className={`nav-links${menuOpen ? " active" : ""}`} id="navLinks">
           {navItems.map((item) => (
@@ -72,12 +79,10 @@ export default function Header() {
             rel="noopener"
             aria-label="Abhima Group"
           >
-            <Image
-              src="/images/superlogo.png"
+            <img
+              src={groupLogoSrc}
               alt="Abhima Group"
               className="super-group-logo"
-              width={40}
-              height={40}
             />
           </a>
           <button

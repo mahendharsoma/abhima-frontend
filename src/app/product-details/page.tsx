@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { getImageUrl } from "@/lib/api";
-import { getWebsiteProduct } from "@/lib/website";
+import { getWebsiteProduct, listWebsiteProductMetrics, listWebsiteProductTags } from "@/lib/website";
 
 interface PageProps {
   searchParams: Promise<Record<string, string | undefined>>;
@@ -12,6 +11,10 @@ export default async function ProductDetailsPage(props: PageProps) {
 
   try {
     const product = await getWebsiteProduct(productId);
+    const [metrics, tags] = await Promise.all([
+      listWebsiteProductMetrics(product.id),
+      listWebsiteProductTags(product.id),
+    ]);
 
     return (
       <>
@@ -47,14 +50,14 @@ export default async function ProductDetailsPage(props: PageProps) {
               )}
 
               {/* Display metrics if available */}
-              {product.metrics && product.metrics.length > 0 && (
+              {metrics.length > 0 && (
                 <div className="product-metrics" style={{ marginTop: "30px" }}>
                   <h3>Key Metrics</h3>
                   <div className="metrics-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "20px", marginTop: "20px" }}>
-                    {product.metrics.map((metric) => (
-                      <div key={metric.metric_id} className="metric-card" style={{ textAlign: "center", padding: "20px", border: "1px solid #e0e0e0", borderRadius: "8px" }}>
-                        <div className="metric-value" style={{ fontSize: "2rem", fontWeight: "bold", color: "#FECD06" }}>{metric.metric_value}</div>
-                        <div className="metric-label" style={{ fontSize: "0.9rem", color: "#666" }}>{metric.metric_label}</div>
+                    {metrics.map((metric) => (
+                      <div key={metric.id} className="metric-card" style={{ textAlign: "center", padding: "20px", border: "1px solid #e0e0e0", borderRadius: "8px" }}>
+                        <div className="metric-value" style={{ fontSize: "2rem", fontWeight: "bold", color: "#FECD06" }}>{metric.metricValue}</div>
+                        <div className="metric-label" style={{ fontSize: "0.9rem", color: "#666" }}>{metric.metricLabel}</div>
                       </div>
                     ))}
                   </div>
@@ -62,13 +65,13 @@ export default async function ProductDetailsPage(props: PageProps) {
               )}
 
               {/* Display tags if available */}
-              {product.tags && product.tags.length > 0 && (
+              {tags.length > 0 && (
                 <div className="product-tags" style={{ marginTop: "30px" }}>
                   <h3>Tags</h3>
                   <div className="tags-container" style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "15px" }}>
-                    {product.tags.map((tag) => (
-                      <span key={tag.product_tag_id} className="product-tag" style={{ background: "#f0f0f0", padding: "5px 12px", borderRadius: "20px", fontSize: "0.9rem", color: "#666" }}>
-                        {tag.tag_name}
+                    {tags.map((tag) => (
+                      <span key={tag.id} className="product-tag" style={{ background: "#f0f0f0", padding: "5px 12px", borderRadius: "20px", fontSize: "0.9rem", color: "#666" }}>
+                        {tag.tagName}
                       </span>
                     ))}
                   </div>

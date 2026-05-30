@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   title: "Abhima Technologies – Empowering Global Enterprises with Digital Solutions",
   description:
     "ABHIMA Technologies is a global technology and software powerhouse, delivering next generation solutions that fuel digital transformation.",
+  icons: {
+    icon: "/images/superlogo.png",
+  },
 };
 
 export default function RootLayout({

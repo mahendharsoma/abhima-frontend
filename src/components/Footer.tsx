@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
-import { listWebsiteServices } from "@/lib/website";
+import { listWebsiteServices, getSetting } from "@/lib/website";
+import { getImageUrl } from "@/lib/api";
 
 interface FooterProps {
   ctaTitle?: string;
@@ -23,6 +23,32 @@ export default async function Footer({
 }: FooterProps) {
   const services = await listWebsiteServices().catch(() => []);
   const footerServices = services.slice(0, 5);
+  const setting = await getSetting().catch(() => null);
+
+  const brochureLink = setting?.brochure?.trim() || "/Brochure/broucher.pdf";
+  const companyName = setting?.companyName || "Abhima Technologies";
+  const companyDescription =
+    setting?.aboutCompany ||
+    "Driving global success through smart digital solutions, future-ready technology, and trusted collaborations.";
+
+  const usaAddress = setting?.usaAddress ||
+    "24155 Drake Road, Suite 206, Farmington, MI 48335-3168, United States";
+  const indiaAddress =
+    setting?.address ||
+    "Sri Venkata Sai Complex, 1-62/33/34 First Floor, Kavuri Hills, Madhapur, Hyderabad 500033";
+  const usaPhone = setting?.usaPhone || "+1-947-622-4462";
+  const usaAltPhone = setting?.usaAltPhone || "+1-947-622-4462";
+  const indiaPhone = setting?.indiaPhone || "+91 99891 30999";
+  const indiaAltPhone = setting?.indiaAltPhone || "+91 90635 85823";
+  const email = setting?.email || "contact@abhima.com";
+  const logo = setting?.logo ? getImageUrl(setting.logo) : "/images/logo.png";
+  const formatTel = (phone: string) => `tel:${phone.replace(/[^+\d]/g, "")}`;
+  const socials = [
+    { href: setting?.facebook, label: "Facebook", icon: "fab fa-facebook-f" },
+    { href: setting?.twitter, label: "Twitter", icon: "fab fa-twitter" },
+    { href: setting?.youtube, label: "YouTube", icon: "fab fa-youtube" },
+    { href: setting?.instagram, label: "Instagram", icon: "fab fa-instagram" },
+  ].filter((item) => !!item.href);
 
   return (
     <footer className="footer">
@@ -37,9 +63,9 @@ export default async function Footer({
             <div className="footer-cta-actions">
               {showBrochure && (
                 <a
-                  href="/Brochure/broucher.pdf"
+                  href={brochureLink}
                   className="footer-cta-btn"
-                  download="broucher.pdf"
+                  download
                 >
                   Download Brochure <i className="fas fa-download"></i>
                 </a>
@@ -59,31 +85,43 @@ export default async function Footer({
             {/* Column 1: Brand */}
             <div className="footer-col footer-brand">
               <Link href="/" className="logo">
-                <Image
-                  src="/images/logo.png"
-                  alt="Abhima Technologies"
+                <img
+                  src={logo}
+                  alt={companyName}
                   className="logo-img"
-                  width={120}
-                  height={120}
                 />
               </Link>
-              <p className="footer-desc">
-                Driving global success through smart digital solutions,
-                future-ready technology, and trusted collaborations.
-              </p>
+              <p className="footer-desc">{companyDescription}</p>
               <div className="footer-socials">
-                <a href="#" className="footer-social-link" aria-label="Instagram">
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a href="#" className="footer-social-link" aria-label="LinkedIn">
-                  <i className="fab fa-linkedin-in"></i>
-                </a>
-                <a href="#" className="footer-social-link" aria-label="WhatsApp">
-                  <i className="fab fa-whatsapp"></i>
-                </a>
-                <a href="#" className="footer-social-link" aria-label="Facebook">
-                  <i className="fab fa-facebook-f"></i>
-                </a>
+                {socials.length > 0 ? (
+                  socials.map((item) => (
+                    <a
+                      key={item.label}
+                      href={item.href!}
+                      className="footer-social-link"
+                      aria-label={item.label}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <i className={item.icon}></i>
+                    </a>
+                  ))
+                ) : (
+                  <>
+                    <a href="#" className="footer-social-link" aria-label="Instagram">
+                      <i className="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" className="footer-social-link" aria-label="LinkedIn">
+                      <i className="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" className="footer-social-link" aria-label="WhatsApp">
+                      <i className="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="#" className="footer-social-link" aria-label="Facebook">
+                      <i className="fab fa-facebook-f"></i>
+                    </a>
+                  </>
+                )}
               </div>
             </div>
 
@@ -126,39 +164,33 @@ export default async function Footer({
                   <i className="fas fa-map-marker-alt"></i>
                   <div>
                     <strong>USA Office</strong>
-                    <p>
-                      24155 Drake Road, Suite 206, Farmington, MI 48335-3168,
-                      United States
-                    </p>
+                    <p>{usaAddress}</p>
                   </div>
                 </div>
                 <div className="footer-contact-item">
                   <i className="fas fa-phone"></i>
                   <div>
-                    <a href="tel:+19476224462">+1-947-6 ABHIMA,</a>
-                    <a href="tel:+19476224462">+1-947-622-4462</a>
+                    <a href={formatTel(usaPhone)}>{usaPhone}</a>
+                    <a href={formatTel(usaAltPhone)}>{usaAltPhone}</a>
                   </div>
                 </div>
                 <div className="footer-contact-item">
                   <i className="fas fa-map-marker-alt"></i>
                   <div>
                     <strong>India Office</strong>
-                    <p>
-                      Sri Venkata Sai Complex, 1-62/33/34 First Floor, Kavuri
-                      Hills, Madhapur, Hyderabad 500033
-                    </p>
+                    <p>{indiaAddress}</p>
                   </div>
                 </div>
                 <div className="footer-contact-item">
                   <i className="fas fa-phone"></i>
                   <div>
-                    <a href="tel:+919989130999">+91 99891 30999,</a>
-                    <a href="tel:+919063585823">+91 90635 85823</a>
+                    <a href={formatTel(indiaPhone)}>{indiaPhone}</a>
+                    <a href={formatTel(indiaAltPhone)}>{indiaAltPhone}</a>
                   </div>
                 </div>
                 <div className="footer-contact-item">
                   <i className="fas fa-envelope"></i>
-                  <a href="mailto:contact@abhima.com">contact@abhima.com</a>
+                  <a href={`mailto:${email}`}>{email}</a>
                 </div>
               </div>
             </div>
@@ -171,7 +203,7 @@ export default async function Footer({
         <div className="container">
           <div className="footer-bottom-inner">
             <p className="footer-copyright">
-              &copy; 2026 Abhima Technologies. All rights reserved.
+              &copy; 2026 {companyName}. All rights reserved.
             </p>
             <div className="footer-legal-links">
               <a href="#">Privacy Policy</a>

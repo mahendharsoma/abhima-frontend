@@ -505,6 +505,7 @@ export interface WebsiteProductItem {
   productImage: string;
   featured: boolean;
   slug: string;
+  metrics?: WebsiteProductMetricItem[];
 }
 
 function normalizeWebsiteProduct(raw: Record<string, unknown>): WebsiteProductItem {
@@ -517,6 +518,7 @@ function normalizeWebsiteProduct(raw: Record<string, unknown>): WebsiteProductIt
     productImage: str(raw.product_image ?? raw.productImage),
     featured: bool(raw.featured),
     slug: str(raw.slug),
+    metrics: extractArray(raw.metrics ?? raw.product_metrics ?? raw.metricsList).map((m) => normalizeProductMetric(m as Record<string, unknown>)),
   };
 }
 

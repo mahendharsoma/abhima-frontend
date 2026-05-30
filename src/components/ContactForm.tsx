@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface FormState {
@@ -35,9 +35,13 @@ function generateCaptcha(length = 5) {
 export default function ContactForm() {
   const [form, setForm] = useState<FormState>(initialState);
   const [loading, setLoading] = useState(false);
-  const [captcha, setCaptcha] = useState(generateCaptcha());
+  const [captcha, setCaptcha] = useState("");
   const [captchaInput, setCaptchaInput] = useState("");
   const [captchaError, setCaptchaError] = useState("");
+
+  useEffect(() => {
+    setCaptcha(generateCaptcha());
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
