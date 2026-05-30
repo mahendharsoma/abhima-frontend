@@ -20,26 +20,28 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Abhima Technologies – Empowering Global Enterprises with Digital Solutions",
+  title: "ABHIMA",
   description:
-    "ABHIMA Technologies is a global technology and software powerhouse, delivering next generation solutions that fuel digital transformation.",
+    "ABHIMA ",
+
   icons: {
     icon: "/images/superlogo.png",
+    shortcut: "/images/superlogo.png",
+    apple: "/images/superlogo.png",
   },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        />
+        <link rel="icon" type="image/png" href="/images/superlogo.png" />
+        <link rel="shortcut icon" type="image/png" href="/images/superlogo.png" />
+        <link rel="apple-touch-icon" href="/images/superlogo.png" />
       </head>
       <body>
         <Header />
