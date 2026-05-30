@@ -22,7 +22,7 @@ export default async function PortfolioPage() {
     ? getImageUrl(banners.productsBanner)
     : "";
   const heroTitle = banners?.productsBannerText || "";
-
+   console.log(heroTitle,heroBg);
   const metricsMap = new Map<number, { value: string; label: string }[]>();
   const tagsMap = new Map<number, string[]>();
 
