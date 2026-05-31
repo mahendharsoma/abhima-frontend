@@ -109,10 +109,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Contact email error:", err);
-    return NextResponse.json(
-      { error: "Failed to send email. Please try again later." },
-      { status: 500 },
-    );
+    const debugEnabled = process.env.EMAIL_DEBUG === "true" || process.env.NODE_ENV !== "production";
+    const errorPayload: { error: string; details?: string } = {
+      error: "Failed to send email. Please try again later.",
+    };
+
+    if (debugEnabled && err instanceof Error) {
+      errorPayload.details = err.message;
+    }
+
+    return NextResponse.json(errorPayload, { status: 500 });
   }
 }
 

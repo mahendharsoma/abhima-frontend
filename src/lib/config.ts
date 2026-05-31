@@ -22,9 +22,11 @@ export const contactSubjects = [
 // Recipient email(s) to receive contact form submissions:
 //   CONTACT_EMAIL  — comma-separated for multiple recipients
 
+const smtpPort = Number(process.env.SMTP_PORT ?? "");
+
 export const emailConfig = {
   host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: Number(process.env.SMTP_PORT) || 587,
+  port: Number.isInteger(smtpPort) && smtpPort > 0 ? smtpPort : 587,
   user: process.env.SMTP_USER || "",
   pass: process.env.SMTP_PASS || "",
   to: process.env.CONTACT_EMAIL || "",
