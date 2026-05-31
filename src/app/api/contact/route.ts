@@ -91,13 +91,32 @@ export async function POST(req: NextRequest) {
 
     const recipients = emailConfig.to.split(",").map((e) => e.trim()).filter(Boolean);
 
-    await transporter.sendMail({
+    const mailResult = await transporter.sendMail({
       from: `"Contact Request" <${emailConfig.user}>`,
       to: recipients.join(", "),
       replyTo: email,
       subject: subject ? `Contact: ${subject}` : `Contact from ${fullName}`,
       html: htmlBody,
     });
+
+    if (
+      Array.isArray(mailResult.rejected) &&
+      mailResult.rejected.length > 0
+    ) {
+      console.error("Email was rejected by SMTP server:", mailResult);
+      return NextResponse.json(
+        { error: "Email delivery failed. Please try again later." },
+        { status: 500 },
+      );
+    }
+
+    if (!Array.isArray(mailResult.accepted) || mailResult.accepted.length === 0) {
+      console.error("Email was not accepted by SMTP server:", mailResult);
+      return NextResponse.json(
+        { error: "Email delivery failed. Please try again later." },
+        { status: 500 },
+      );
+    }
 
     // --- Save to database via backend API ---
     try {
