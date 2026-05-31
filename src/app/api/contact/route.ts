@@ -38,85 +38,86 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!emailConfig.user || !emailConfig.pass || !emailConfig.to) {
-      console.error("SMTP credentials or CONTACT_EMAIL not configured.");
-      return NextResponse.json(
-        { error: "Email service is not configured." },
-        { status: 500 },
-      );
-    }
+    // Email sending is disabled - only saving to database
+    // if (!emailConfig.user || !emailConfig.pass || !emailConfig.to) {
+    //   console.error("SMTP credentials or CONTACT_EMAIL not configured.");
+    //   return NextResponse.json(
+    //     { error: "Email service is not configured." },
+    //     { status: 500 },
+    //   );
+    // }
 
     const smtpDebug = process.env.EMAIL_DEBUG === "true";
     const secure = emailConfig.port === 465;
 
     // --- Build transporter ---
-    const transporter = nodemailer.createTransport({
-      host: emailConfig.host,
-      port: emailConfig.port,
-      secure,
-      auth: {
-        user: emailConfig.user,
-        pass: emailConfig.pass,
-      },
-      logger: smtpDebug,
-      debug: smtpDebug,
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
-    });
+    // const transporter = nodemailer.createTransport({
+    //   host: emailConfig.host,
+    //   port: emailConfig.port,
+    //   secure,
+    //   auth: {
+    //     user: emailConfig.user,
+    //     pass: emailConfig.pass,
+    //   },
+    //   logger: smtpDebug,
+    //   debug: smtpDebug,
+    //   connectionTimeout: 10000,
+    //   greetingTimeout: 10000,
+    //   socketTimeout: 10000,
+    // });
 
-    if (smtpDebug) {
-      console.log("SMTP transport config:", {
-        host: emailConfig.host,
-        port: emailConfig.port,
-        secure,
-      });
-    }
+    // if (smtpDebug) {
+    //   console.log("SMTP transport config:", {
+    //     host: emailConfig.host,
+    //     port: emailConfig.port,
+    //     secure,
+    //   });
+    // }
 
-    // verify connection configuration on the server
-    await transporter.verify();
+    // // verify connection configuration on the server
+    // await transporter.verify();
 
-    // --- Email content ---
-    const htmlBody = `
-      <h2>New Contact Form Submission</h2>
-      <table style="border-collapse:collapse;width:100%;max-width:600px;">
-        <tr><td style="padding:8px;font-weight:bold;">Name</td><td style="padding:8px;">${escapeHtml(fullName)}</td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Phone</td><td style="padding:8px;">${escapeHtml(phone)}</td></tr>
-        ${altPhone ? `<tr><td style="padding:8px;font-weight:bold;">Alt Phone</td><td style="padding:8px;">${escapeHtml(altPhone)}</td></tr>` : ""}
-        <tr><td style="padding:8px;font-weight:bold;">Email</td><td style="padding:8px;">${escapeHtml(email)}</td></tr>
-        ${subject ? `<tr><td style="padding:8px;font-weight:bold;">Subject</td><td style="padding:8px;">${escapeHtml(subject)}</td></tr>` : ""}
-        <tr><td style="padding:8px;font-weight:bold;">Message</td><td style="padding:8px;">${escapeHtml(message)}</td></tr>
-      </table>
-    `;
+    // // --- Email content ---
+    // const htmlBody = `
+    //   <h2>New Contact Form Submission</h2>
+    //   <table style="border-collapse:collapse;width:100%;max-width:600px;">
+    //     <tr><td style="padding:8px;font-weight:bold;">Name</td><td style="padding:8px;">${escapeHtml(fullName)}</td></tr>
+    //     <tr><td style="padding:8px;font-weight:bold;">Phone</td><td style="padding:8px;">${escapeHtml(phone)}</td></tr>
+    //     ${altPhone ? `<tr><td style="padding:8px;font-weight:bold;">Alt Phone</td><td style="padding:8px;">${escapeHtml(altPhone)}</td></tr>` : ""}
+    //     <tr><td style="padding:8px;font-weight:bold;">Email</td><td style="padding:8px;">${escapeHtml(email)}</td></tr>
+    //     ${subject ? `<tr><td style="padding:8px;font-weight:bold;">Subject</td><td style="padding:8px;">${escapeHtml(subject)}</td></tr>` : ""}
+    //     <tr><td style="padding:8px;font-weight:bold;">Message</td><td style="padding:8px;">${escapeHtml(message)}</td></tr>
+    //   </table>
+    // `;
 
-    const recipients = emailConfig.to.split(",").map((e) => e.trim()).filter(Boolean);
+    // const recipients = emailConfig.to.split(",").map((e) => e.trim()).filter(Boolean);
 
-    const mailResult = await transporter.sendMail({
-      from: `"Contact Request" <${emailConfig.user}>`,
-      to: recipients.join(", "),
-      replyTo: email,
-      subject: subject ? `Contact: ${subject}` : `Contact from ${fullName}`,
-      html: htmlBody,
-    });
+    // const mailResult = await transporter.sendMail({
+    //   from: `"Contact Request" <${emailConfig.user}>`,
+    //   to: recipients.join(", "),
+    //   replyTo: email,
+    //   subject: subject ? `Contact: ${subject}` : `Contact from ${fullName}`,
+    //   html: htmlBody,
+    // });
 
-    if (
-      Array.isArray(mailResult.rejected) &&
-      mailResult.rejected.length > 0
-    ) {
-      console.error("Email was rejected by SMTP server:", mailResult);
-      return NextResponse.json(
-        { error: "Email delivery failed. Please try again later." },
-        { status: 500 },
-      );
-    }
+    // if (
+    //   Array.isArray(mailResult.rejected) &&
+    //   mailResult.rejected.length > 0
+    // ) {
+    //   console.error("Email was rejected by SMTP server:", mailResult);
+    //   return NextResponse.json(
+    //     { error: "Email delivery failed. Please try again later." },
+    //     { status: 500 },
+    //   );
+    // }
 
-    if (!Array.isArray(mailResult.accepted) || mailResult.accepted.length === 0) {
-      console.error("Email was not accepted by SMTP server:", mailResult);
-      return NextResponse.json(
-        { error: "Email delivery failed. Please try again later." },
-        { status: 500 },
-      );
-    }
+    // if (!Array.isArray(mailResult.accepted) || mailResult.accepted.length === 0) {
+    //   console.error("Email was not accepted by SMTP server:", mailResult);
+    //   return NextResponse.json(
+    //     { error: "Email delivery failed. Please try again later." },
+    //     { status: 500 },
+    //   );
+    // }
 
     // --- Save to database via backend API ---
     try {
