@@ -33,7 +33,7 @@ export default async function Home() {
       productTagsMap.set(p.id, tags.map((t) => t.tagName));
     }),
   );
-
+console.log('whychooseus', whyChooseUs);
   const aboutUs = aboutUsList[0];
 
   return (
