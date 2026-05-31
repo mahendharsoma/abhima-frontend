@@ -46,16 +46,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const smtpDebug = process.env.EMAIL_DEBUG === "true";
+    const secure = emailConfig.port === 465;
+
     // --- Build transporter ---
     const transporter = nodemailer.createTransport({
       host: emailConfig.host,
       port: emailConfig.port,
-      secure: emailConfig.port === 465,
+      secure,
       auth: {
         user: emailConfig.user,
         pass: emailConfig.pass,
       },
+      logger: smtpDebug,
+      debug: smtpDebug,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
     });
+
+    if (smtpDebug) {
+      console.log("SMTP transport config:", {
+        host: emailConfig.host,
+        port: emailConfig.port,
+        secure,
+      });
+    }
 
     // verify connection configuration on the server
     await transporter.verify();
