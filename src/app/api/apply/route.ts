@@ -98,48 +98,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // --- Send email ---
-    if (!emailConfig.user || !emailConfig.pass || !emailConfig.to) {
-      console.error("SMTP credentials or CONTACT_EMAIL not configured.");
-      return NextResponse.json(
-        { error: "Email service is not configured." },
-        { status: 500 }
-      );
-    }
+    // --- Email sending is disabled - only saving to database ---
+    // if (!emailConfig.user || !emailConfig.pass || !emailConfig.to) {
+    //   console.error("SMTP credentials or CONTACT_EMAIL not configured.");
+    //   return NextResponse.json(
+    //     { error: "Email service is not configured." },
+    //     { status: 500 }
+    //   );
+    // }
 
-    const transporter = nodemailer.createTransport({
-      host: emailConfig.host,
-      port: emailConfig.port,
-      secure: emailConfig.port === 465,
-      auth: { user: emailConfig.user, pass: emailConfig.pass },
-    });
+    // const transporter = nodemailer.createTransport({
+    //   host: emailConfig.host,
+    //   port: emailConfig.port,
+    //   secure: emailConfig.port === 465,
+    //   auth: { user: emailConfig.user, pass: emailConfig.pass },
+    // });
 
-    const resumeBuffer = Buffer.from(await resume.arrayBuffer());
-    const recipients = emailConfig.to.split(",").map((e) => e.trim()).filter(Boolean);
+    // const resumeBuffer = Buffer.from(await resume.arrayBuffer());
+    // const recipients = emailConfig.to.split(",").map((e) => e.trim()).filter(Boolean);
 
-    await transporter.sendMail({
-      from: `"Job Applications" <${emailConfig.user}>`,
-      to: recipients.join(", "),
-      replyTo: email,
-      subject: `Job Application: ${jobTitle} — ${name}`,
-      html: `
-        <h2>New Job Application</h2>
-        <table style="border-collapse:collapse;width:100%;max-width:600px;">
-          <tr><td style="padding:8px;font-weight:bold;">Position</td><td style="padding:8px;">${escapeHtml(jobTitle)}</td></tr>
-          <tr><td style="padding:8px;font-weight:bold;">Name</td><td style="padding:8px;">${escapeHtml(name)}</td></tr>
-          <tr><td style="padding:8px;font-weight:bold;">Phone</td><td style="padding:8px;">${escapeHtml(phone)}</td></tr>
-          <tr><td style="padding:8px;font-weight:bold;">Email</td><td style="padding:8px;">${escapeHtml(email)}</td></tr>
-        </table>
-        <p>Resume attached.</p>
-      `,
-      attachments: [
-        {
-          filename: resume.name,
-          content: resumeBuffer,
-          contentType: resume.type,
-        },
-      ],
-    });
+    // await transporter.sendMail({
+    //   from: `"Job Applications" <${emailConfig.user}>`,
+    //   to: recipients.join(", "),
+    //   replyTo: email,
+    //   subject: `Job Application: ${jobTitle} — ${name}`,
+    //   html: `
+    //     <h2>New Job Application</h2>
+    //     <table style="border-collapse:collapse;width:100%;max-width:600px;">
+    //       <tr><td style="padding:8px;font-weight:bold;">Position</td><td style="padding:8px;">${escapeHtml(jobTitle)}</td></tr>
+    //       <tr><td style="padding:8px;font-weight:bold;">Name</td><td style="padding:8px;">${escapeHtml(name)}</td></tr>
+    //       <tr><td style="padding:8px;font-weight:bold;">Phone</td><td style="padding:8px;">${escapeHtml(phone)}</td></tr>
+    //       <tr><td style="padding:8px;font-weight:bold;">Email</td><td style="padding:8px;">${escapeHtml(email)}</td></tr>
+    //     </table>
+    //     <p>Resume attached.</p>
+    //   `,
+    //   attachments: [
+    //     {
+    //       filename: resume.name,
+    //       content: resumeBuffer,
+    //       contentType: resume.type,
+    //     },
+    //   ],
+    // });
 
     return NextResponse.json({ success: true });
   } catch (err) {
