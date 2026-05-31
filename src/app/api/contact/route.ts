@@ -57,6 +57,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // verify connection configuration on the server
+    await transporter.verify();
+
     // --- Email content ---
     const htmlBody = `
       <h2>New Contact Form Submission</h2>
